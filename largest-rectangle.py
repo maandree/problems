@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Find the largest rectangle in O(n²)
+# Find the largest rectangle in O(nm)
 
 import sys, random
 
