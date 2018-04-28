@@ -5,8 +5,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#define INPUT_SIZE 1000000UL
-
 typedef signed int int_t;
 typedef unsigned int uint_t;
 #define PRINT_FMT "i"
@@ -88,24 +86,22 @@ solve(int_t capacity, int_t n, register char *restrict wr)
 int
 main(void)
 {
-	int_t capacity, n, i;
+	int_t capacity, cap, n, i;
 
 	size_t ptr = 0, size;
 	ssize_t r;
-	char *restrict input = mmap(NULL, INPUT_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	register const char *restrict p = input;
-	register char *restrict output = input;
+	char output[100000UL];
+	const register char *restrict p;
 	register char *restrict w = output;
 
-	while ((r = syscall(SYS_read, 0, &input[ptr], INPUT_SIZE)))
-		ptr += (size_t)r;
-	input[ptr] = '\0';
+	p = mmap(NULL, 1000000UL, PROT_READ, MAP_SHARED, 0, 0);
 
-	for (p = input; *p; p++) {
+	for (; *p; p++) {
 		p = parseheadpair(p, &capacity, &n);
+		cap = capacity + 1;
 		for (i = 1; i <= n;) {
 			p = parseintpair(&p[1], &values[i], &weights[i]);
-			if (weights[i] > capacity + 1)
+			if (weights[i] > cap)
 				n--;
 			else
 				i++;
