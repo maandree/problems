@@ -43,17 +43,13 @@ main(void)
 	char *restrict buf;
 	register const char *restrict p;
 	register char *restrict w;
-	size_t size = 16000016, ptr = 0;
+	size_t size, ptr = 0;
 	ssize_t r;
 
 	node_t q, a, b;
 	char op;
 
-	p = w = buf = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-	for (;; ptr += (size_t)r)
-		if (!(r = syscall(SYS_read, 0, &buf[ptr], size)))
-			break;
-
+	p = w = buf = mmap(NULL, 16000016, PROT_READ | PROT_WRITE, MAP_PRIVATE, 0, 0);
 	p = parseintpair(p, &a, &q);
 
 	nodes = alloca((size_t)a * sizeof(*nodes));
@@ -81,7 +77,6 @@ main(void)
 	}
 
 	size = (size_t)(w - buf);
-	ptr = 0;
 	while (ptr < size) {
 		r = syscall(SYS_write, 1, &buf[ptr], size - ptr);
 		ptr += (size_t)r;
