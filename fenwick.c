@@ -1,5 +1,5 @@
-#include <sys/syscall.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <alloca.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -58,19 +58,14 @@ parseintpair(register const char *restrict s, int_t *restrict ap, int_t *restric
 int
 main()
 {
-	char *restrict buf;
 	register const char *restrict p;
-	size_t size = 110000016, ptr = 0;
-	ssize_t r;
+	struct stat st;
 
 	int_t n, q, j, delta;
 	register int_t rc, i;
 
-	p = buf = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
-	for (;; ptr += (size_t)r)
-		if (!(r = syscall(SYS_read, 0, &buf[ptr], size)))
-			break;
-
+	fstat(0, &st);
+	p = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, 0, 0);
 	p = parseintpair(p, &n, &q);
 
 	while (q--) {
