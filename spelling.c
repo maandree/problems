@@ -1,4 +1,5 @@
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,9 +7,8 @@
 #include <unistd.h>
 
 
-#define CORR_SIZE  400UL
-#define INPUT_SIZE 5000001UL
-#define DICT_SIZE  400000L
+#define CORR_SIZE 400UL
+#define DICT_SIZE 400000L
 
 
 typedef struct word {
@@ -143,17 +143,15 @@ int
 main(void)
 {
 	size_t k;
-	size_t ptr = 0;
-	ssize_t got;
-	char *restrict input = mmap(NULL, INPUT_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	struct stat st;
+	char *restrict input;
 	register char *restrict r;
 	register char *restrict w;
 	word_t used;
 	register const char *restrict last_word = "";
 
-	while ((got = read(0, &input[ptr], INPUT_SIZE)))
-		ptr += (size_t)got;
-	input[ptr] = '\0';
+	fstat(0, &st);
+	input = mmap(NULL, st.st_size + 1, PROT_READ | PROT_WRITE, MAP_PRIVATE, 0, 0);
 
 	for (r = input; *r && (unsigned char)*r != 0xC3; r++);
 	for (w = r; *r; r++)
